@@ -1,0 +1,34 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: woocommerce
+spec:
+  serviceName: woocommerce
+  replicas: 1
+  selector:
+    matchLabels:
+      app: woocommerce
+  template:
+    metadata:
+      labels:
+        app: woocommerce
+    spec:
+      containers:
+        - name: woocommerce
+          image: woocommerce:latest  # This should be the name of the image built from the above Dockerfile
+          ports:
+            - containerPort: 80
+          env:
+            - name: WORDPRESS_DB_HOST
+              value: "mysql"
+            - name: WORDPRESS_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: username
+            - name: WORDPRESS_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: password
